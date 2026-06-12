@@ -1,0 +1,20 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "composite": true,
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo"
+  },
+  "include": ["src"],
+  "exclude": [
+    "src/components/BottomSchoolsList.tsx",
+    "src/components/CrisisAlert.tsx",
+    "src/components/FacilityAnalysis.tsx",
+    "src/components/FacilityGrid.tsx",
+    "src/components/FacultyGrid.tsx",
+    "src/components/IndicatorRadar.tsx",
+    "src/components/IndicatorSunburst.tsx",
+    "src/components/OverviewCards.tsx",
+    "src/components/RegionalGrid.tsx",
+    "src/components/ScoreDistribution.tsx"
+  ]
+}

@@ -1,0 +1,185 @@
+import { useEffect, useRef, type ReactNode, type RefObject } from 'react';
+import type { DashboardData } from '../types';
+import StatCard from './StatCard';
+import OverviewChartCell from './OverviewChartCell';
+import ConnectionsViz from './ConnectionsViz';
+import GlobalStatisticViz from './figma/GlobalStatisticViz';
+import StackedBarViz from './figma/StackedBarViz';
+import AreaChartViz from './figma/AreaChartViz';
+import SchoolTypeRateViz from './figma/SchoolTypeRateViz';
+import RoseChartViz from './figma/RoseChartViz';
+import SankeyPassFlow from './SankeyPassFlow';
+import IndicatorRadar from './IndicatorRadar';
+import ConcentricRadialViz from './figma/ConcentricRadialViz';
+import SchoolTypeComparison from './SchoolTypeComparison';
+import OverviewBackupSection from './OverviewBackupSection';
+import { OverviewScrollContext } from '../contexts/OverviewScrollContext';
+
+function OverviewSnapSection({
+  children,
+  className = '',
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return <section className={`overview-snap-section ${className}`.trim()}>{children}</section>;
+}
+
+export default function OverviewPage({
+  data,
+  scrollContainerRef,
+}: {
+  data: DashboardData;
+  scrollContainerRef: RefObject<HTMLElement | null>;
+}) {
+  const { overall } = data;
+  const kpiRef = useRef<HTMLDivElement>(null);
+
+  /** 同步 KPI / 各 snap 分页高度，避免 sticky 遮挡与底部露出下一页 */
+  useEffect(() => {
+    const el = scrollContainerRef.current;
+    const kpi = kpiRef.current;
+    if (!el || !kpi) return;
+
+    const syncSnapLayout = () => {
+      const kpiH = kpi.offsetHeight;
+      if (kpiH < 1) return;
+
+      const titleH = document.querySelector('.page-title-banner')?.getBoundingClientRect().height ?? 110;
+      const footerH = document.querySelector('.app-footer')?.getBoundingClientRect().height ?? 36;
+      const padTop = 10;
+      const safeBottom = 14;
+      const viewport = Math.max(320, window.innerHeight - titleH - footerH - kpiH);
+      const sectionH = Math.max(280, viewport - padTop - safeBottom);
+
+      el.style.setProperty('--overview-kpi-block', `${kpiH}px`);
+      el.style.setProperty('--overview-snap-pad-top', `${padTop}px`);
+      el.style.setProperty('--overview-snap-safe-bottom', `${safeBottom}px`);
+      el.style.setProperty('--overview-snap-section-height', `${sectionH}px`);
+    };
+
+    syncSnapLayout();
+    const ro = new ResizeObserver(syncSnapLayout);
+    ro.observe(kpi);
+    window.addEventListener('resize', syncSnapLayout);
+
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', syncSnapLayout);
+    };
+  }, [scrollContainerRef]);
+
+  /** 滚回顶部时 snap 会停在第一屏图表，补滚到 0 以显示指标条 */
+  useEffect(() => {
+    const el = scrollContainerRef.current;
+    const kpi = kpiRef.current;
+    if (!el || !kpi) return;
+
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let settling = false;
+    let gestureStartTop = el.scrollTop;
+
+    const settleKpiTop = () => {
+      if (settling) return;
+      const kpiH = kpi.offsetHeight;
+      if (kpiH <= 0) return;
+      const st = el.scrollTop;
+      const scrolledUp = st < gestureStartTop;
+      if (!scrolledUp) {
+        gestureStartTop = st;
+        return;
+      }
+      if (st > 0 && st < kpiH * 0.55) {
+        settling = true;
+        el.scrollTo({ top: 0, behavior: 'smooth' });
+        window.setTimeout(() => {
+          settling = false;
+          gestureStartTop = 0;
+        }, 400);
+      }
+    };
+
+    const onScroll = () => {
+      if (!timer) gestureStartTop = el.scrollTop;
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        timer = undefined;
+        settleKpiTop();
+      }, 150);
+    };
+
+    el.addEventListener('scroll', onScroll, { passive: true });
+    el.addEventListener('scrollend', settleKpiTop);
+    return () => {
+      if (timer) clearTimeout(timer);
+      el.removeEventListener('scroll', onScroll);
+      el.removeEventListener('scrollend', settleKpiTop);
+    };
+  }, [scrollContainerRef]);
+
+  return (
+    <OverviewScrollContext.Provider value={scrollContainerRef}>
+    <div className="overview-page">
+      <div className="overview-kpi" ref={kpiRef}>
+        <div className="overview-kpi-grid">
+          <StatCard icon="🏫" label="监测学校总数" value={overall.total_schools} suffix="所" color="#8676FF" className="stagger-1" />
+          <StatCard icon="📊" label="平均总分" value={overall.avg_score.toFixed(1)} suffix="/44" color="#023AFF" className="stagger-2" />
+          <StatCard icon="✅" label="综合得分率" value={(overall.avg_rate * 100).toFixed(1)} suffix="%" color="#00B929" className="stagger-3" />
+          <StatCard icon="🏆" label="满分学校" value={overall.schools_full_score} suffix="所" color="#FFBA69" className="stagger-4" />
+          <StatCard icon="⚠️" label="最低得分" value={overall.min_score} suffix="分" color="#FF2D2E" className="stagger-5" />
+          <StatCard icon="📈" label="≥40分占比" value={((overall.schools_above_40 / overall.total_schools) * 100).toFixed(0)} suffix="%" color="#FF708B" className="stagger-6" />
+        </div>
+      </div>
+
+      <OverviewSnapSection className="overview-snap-section--hero">
+        <div className="overview-hero-left">
+          <div className="overview-hero-left-top">
+            <OverviewChartCell delay={0}>
+              <GlobalStatisticViz data={data} compact />
+            </OverviewChartCell>
+            <OverviewChartCell delay={120}>
+              <ConcentricRadialViz data={data} hero />
+            </OverviewChartCell>
+          </div>
+          <div className="overview-hero-left-bottom">
+            <OverviewChartCell delay={80}>
+              <AreaChartViz data={data} compact />
+            </OverviewChartCell>
+            <OverviewChartCell delay={100}>
+              <SchoolTypeRateViz data={data} compact />
+            </OverviewChartCell>
+          </div>
+        </div>
+        <div className="overview-hero-right">
+          <OverviewChartCell delay={160} className="overview-chart-cell--hero-half">
+            <RoseChartViz data={data} heroHalf />
+          </OverviewChartCell>
+          <OverviewChartCell delay={180} className="overview-chart-cell--hero-half">
+            <IndicatorRadar data={data} inline />
+          </OverviewChartCell>
+        </div>
+      </OverviewSnapSection>
+
+      <OverviewSnapSection className="overview-snap-section--compact-height">
+        <OverviewChartCell delay={120}>
+          <SankeyPassFlow data={data} />
+        </OverviewChartCell>
+        <OverviewChartCell delay={160}>
+          <ConnectionsViz data={data} />
+        </OverviewChartCell>
+      </OverviewSnapSection>
+
+      <OverviewSnapSection className="overview-snap-section--stacked-bar">
+        <OverviewChartCell delay={0}>
+          <StackedBarViz data={data} compact fillHeight />
+        </OverviewChartCell>
+        <OverviewChartCell delay={80}>
+          <SchoolTypeComparison data={data} inline />
+        </OverviewChartCell>
+      </OverviewSnapSection>
+
+      <OverviewBackupSection data={data} />
+    </div>
+    </OverviewScrollContext.Provider>
+  );
+}
