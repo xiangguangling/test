@@ -120,32 +120,60 @@ export default function OverviewPage({
     };
   }, [scrollContainerRef]);
 
-  /** 滚轮轻推即整页切换（共 5 屏图表） */
+  /** 滚轮轻推即整页切换（共 5 屏图表）；capture 阶段拦截，避免 ECharts 等子组件吞掉滚轮 */
   useEffect(() => {
     const el = scrollContainerRef.current;
     const kpi = kpiRef.current;
     if (!el || !kpi) return;
 
     let locked = false;
+    let unlockTimer: ReturnType<typeof setTimeout> | undefined;
+
+    const unlock = () => {
+      locked = false;
+      if (unlockTimer) {
+        clearTimeout(unlockTimer);
+        unlockTimer = undefined;
+      }
+    };
+
+    const scheduleUnlock = () => {
+      if (unlockTimer) clearTimeout(unlockTimer);
+      unlockTimer = window.setTimeout(unlock, 900);
+    };
 
     const getSnapTargets = () => {
       const kpiH = kpi.offsetHeight;
+      const page = el.querySelector<HTMLElement>('.overview-page');
       const sections = el.querySelectorAll<HTMLElement>('.overview-snap-section');
-      return Array.from(sections).map((section) => Math.max(0, section.offsetTop - kpiH));
+      return Array.from(sections).map((section) => {
+        const top = page
+          ? section.getBoundingClientRect().top - page.getBoundingClientRect().top
+          : section.offsetTop;
+        return Math.max(0, top - kpiH);
+      });
     };
 
     const getCurrentIndex = (targets: number[]) => {
       const st = el.scrollTop;
-      let idx = 0;
+      let nearest = 0;
+      let minDist = Infinity;
       for (let i = 0; i < targets.length; i++) {
-        if (st >= targets[i] - 24) idx = i;
+        const dist = Math.abs(st - targets[i]);
+        if (dist < minDist) {
+          minDist = dist;
+          nearest = i;
+        }
       }
-      return idx;
+      return nearest;
     };
 
     const onWheel = (e: WheelEvent) => {
+      if (!el.contains(e.target as Node)) return;
+
       if (locked) {
         e.preventDefault();
+        e.stopPropagation();
         return;
       }
 
@@ -154,22 +182,31 @@ export default function OverviewPage({
 
       const current = getCurrentIndex(targets);
       const maxIndex = targets.length - 1;
+      const goingDown = e.deltaY > 8;
+      const goingUp = e.deltaY < -8;
 
-      if (e.deltaY > 8 && current < maxIndex) {
+      if (goingDown && current < maxIndex) {
         e.preventDefault();
+        e.stopPropagation();
         locked = true;
         el.scrollTo({ top: targets[current + 1], behavior: 'smooth' });
-        window.setTimeout(() => { locked = false; }, 650);
-      } else if (e.deltaY < -8 && current > 0) {
+        scheduleUnlock();
+      } else if (goingUp && current > 0) {
         e.preventDefault();
+        e.stopPropagation();
         locked = true;
         el.scrollTo({ top: targets[current - 1], behavior: 'smooth' });
-        window.setTimeout(() => { locked = false; }, 650);
+        scheduleUnlock();
       }
     };
 
-    el.addEventListener('wheel', onWheel, { passive: false });
-    return () => el.removeEventListener('wheel', onWheel);
+    el.addEventListener('wheel', onWheel, { passive: false, capture: true });
+    el.addEventListener('scrollend', unlock);
+    return () => {
+      if (unlockTimer) clearTimeout(unlockTimer);
+      el.removeEventListener('wheel', onWheel, { capture: true });
+      el.removeEventListener('scrollend', unlock);
+    };
   }, [scrollContainerRef]);
 
   return (
