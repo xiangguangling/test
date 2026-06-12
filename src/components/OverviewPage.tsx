@@ -233,7 +233,23 @@ export default function OverviewPage({
         </OverviewChartCell>
       </OverviewSnapSection>
 
-      <OverviewBackupSection data={data} />
+      <OverviewSnapSection className="overview-snap-section--triple">
+        <OverviewChartCell delay={0}>
+          <WeaknessBars data={data} compact />
+        </OverviewChartCell>
+        <OverviewChartCell delay={80}>
+          <UrbanRuralHeatmap data={data} compact />
+        </OverviewChartCell>
+        <OverviewChartCell delay={160}>
+          <BottomSchoolsList data={data} compact />
+        </OverviewChartCell>
+      </OverviewSnapSection>
+
+      <OverviewSnapSection className="overview-snap-section--radial">
+        <OverviewChartCell delay={0}>
+          <RadialTreeViz data={data} overview />
+        </OverviewChartCell>
+      </OverviewSnapSection>
     </div>
     </OverviewScrollContext.Provider>
   );
