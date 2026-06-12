@@ -120,6 +120,58 @@ export default function OverviewPage({
     };
   }, [scrollContainerRef]);
 
+  /** 滚轮轻推即整页切换（共 5 屏图表） */
+  useEffect(() => {
+    const el = scrollContainerRef.current;
+    const kpi = kpiRef.current;
+    if (!el || !kpi) return;
+
+    let locked = false;
+
+    const getSnapTargets = () => {
+      const kpiH = kpi.offsetHeight;
+      const sections = el.querySelectorAll<HTMLElement>('.overview-snap-section');
+      return Array.from(sections).map((section) => Math.max(0, section.offsetTop - kpiH));
+    };
+
+    const getCurrentIndex = (targets: number[]) => {
+      const st = el.scrollTop;
+      let idx = 0;
+      for (let i = 0; i < targets.length; i++) {
+        if (st >= targets[i] - 24) idx = i;
+      }
+      return idx;
+    };
+
+    const onWheel = (e: WheelEvent) => {
+      if (locked) {
+        e.preventDefault();
+        return;
+      }
+
+      const targets = getSnapTargets();
+      if (targets.length === 0) return;
+
+      const current = getCurrentIndex(targets);
+      const maxIndex = targets.length - 1;
+
+      if (e.deltaY > 8 && current < maxIndex) {
+        e.preventDefault();
+        locked = true;
+        el.scrollTo({ top: targets[current + 1], behavior: 'smooth' });
+        window.setTimeout(() => { locked = false; }, 650);
+      } else if (e.deltaY < -8 && current > 0) {
+        e.preventDefault();
+        locked = true;
+        el.scrollTo({ top: targets[current - 1], behavior: 'smooth' });
+        window.setTimeout(() => { locked = false; }, 650);
+      }
+    };
+
+    el.addEventListener('wheel', onWheel, { passive: false });
+    return () => el.removeEventListener('wheel', onWheel);
+  }, [scrollContainerRef]);
+
   return (
     <OverviewScrollContext.Provider value={scrollContainerRef}>
     <div className="overview-page">
