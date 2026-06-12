@@ -144,12 +144,9 @@ export default function OverviewPage({
 
     const getSnapTargets = () => {
       const kpiH = kpi.offsetHeight;
-      const page = el.querySelector<HTMLElement>('.overview-page');
       const sections = el.querySelectorAll<HTMLElement>('.overview-snap-section');
       return Array.from(sections).map((section) => {
-        const top = page
-          ? section.getBoundingClientRect().top - page.getBoundingClientRect().top
-          : section.offsetTop;
+        const top = section.getBoundingClientRect().top - el.getBoundingClientRect().top + el.scrollTop;
         return Math.max(0, top - kpiH);
       });
     };
