@@ -98,7 +98,7 @@ export default function FacilityPage({ data }: { data: DashboardData }) {
       </TabSnapSection>
 
       <TabSnapSection>
-        <ChartCard title="七维度指标分布" insight={null}>
+        <ChartCard title="七维度指标分布">
           <div ref={boxRef} className="chart-echarts-host" />
         </ChartCard>
       </TabSnapSection>
