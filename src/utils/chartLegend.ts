@@ -49,8 +49,8 @@ export function buildBottomLegend(
 }
 
 /** 带底部图例时 radar 布局（Hero 半宽卡片，留边距防溢出） */
-export const bottomLegendRadarCenter: [string, string] = ['50%', '43%'];
-export const bottomLegendRadarRadius = '58%';
+export const bottomLegendRadarCenter: [string, string] = ['50%', '50%'];
+export const bottomLegendRadarRadius = '72%';
 
 /** 带右侧图例时 pie 布局 */
 export const sideLegendPieLayout = {

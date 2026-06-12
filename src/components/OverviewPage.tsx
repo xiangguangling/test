@@ -167,6 +167,9 @@ export default function OverviewPage({
 
     const onWheel = (e: WheelEvent) => {
       if (!el.contains(e.target as Node)) return;
+      /* 仅当 overview 内容可见（非 hidden）时才拦截滚轮，避免影响 Tab 页滚动 */
+      const overviewRoot = el.querySelector('.overview-page');
+      if (!overviewRoot || (overviewRoot as HTMLElement).offsetParent === null) return;
 
       if (locked) {
         e.preventDefault();

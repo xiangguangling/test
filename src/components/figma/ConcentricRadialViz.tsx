@@ -55,7 +55,7 @@ export default function ConcentricRadialViz({
         radius: `${(hero ? 72 : 78) - i * (hero ? 14 : 16)}%`,
         startAngle: 210,
         endAngle: -30,
-        min: 80,
+        min: 0,
         max: 100,
         pointer: { show: false },
         progress: { show: true, width: ringWidth, roundCap: true, itemStyle: { color: r.color } },

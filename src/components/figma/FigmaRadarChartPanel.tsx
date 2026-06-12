@@ -107,11 +107,11 @@ export default function FigmaRadarChartPanel({
 }: FigmaRadarChartPanelProps) {
   const isRichLabels = series.length === 1;
   /** 单系列带指标名+数值时，缩小雷达为轴标签留出上下空间 */
-  const radiusScale = isRichLabels ? (compact ? 0.92 : 0.66) : 0.82;
-  const radarRadius = `${Math.round(radiusScale * 72)}%`;
+  const radiusScale = isRichLabels ? (compact ? 0.62 : 0.66) : 0.82;
+  const radarRadius = `${Math.round(radiusScale * 92)}%`;
   const chartPad = isRichLabels
     ? compact
-      ? { top: 20, right: 16, bottom: 32, left: 16 }
+      ? { top: 60, right: 50, bottom: 60, left: 50 }
       : { top: 48, right: 36, bottom: 52, left: 36 }
     : { top: 32, right: 28, bottom: 36, left: 28 };
 
@@ -143,8 +143,8 @@ export default function FigmaRadarChartPanel({
           color: '#000',
           fontFamily: 'Open Sans, sans-serif',
           rich: {
-            dim: { fontSize: compact && isRichLabels ? 11 : (isRichLabels ? 12 : 14), fontWeight: 400, color: '#000', lineHeight: compact && isRichLabels ? 16 : 18 },
-            val: { fontSize: compact && isRichLabels ? 13 : (isRichLabels ? 15 : 18), fontWeight: 700, color: '#000', lineHeight: compact && isRichLabels ? 18 : 20 },
+            dim: { fontSize: compact && isRichLabels ? 32 : (isRichLabels ? 18 : 16), fontWeight: 400, color: '#000', lineHeight: compact && isRichLabels ? 38 : 22 },
+            val: { fontSize: compact && isRichLabels ? 38 : (isRichLabels ? 20 : 18), fontWeight: 700, color: '#000', lineHeight: compact && isRichLabels ? 44 : 24 },
           },
         },
         splitLine: { show: false },

@@ -9,8 +9,8 @@ import { getStackedBarInsight } from '../ChartInsights';
 const W = 1070;
 const H = 527;
 /** 线性缩放 0.5 → 面积约 1/4 */
-const W_COMPACT = Math.round(W / 2);
-const H_COMPACT = Math.round(H / 2);
+const W_COMPACT = Math.round(W / 1.1);
+const H_COMPACT = H;
 
 export default function StackedBarViz({
   data,
@@ -34,7 +34,7 @@ export default function StackedBarViz({
         name: t,
         type: 'bar' as const,
         stack: 'total',
-        barWidth: compact ? 6 : 8,
+        barWidth: compact ? 14 : 16,
         itemStyle: { color: SCHOOL_TYPE_COLORS[ti], borderRadius: ti === 2 ? [4, 4, 0, 0] : 0 },
         data: dist.map(d => Math.round(d.count * ratio)),
       };
@@ -51,22 +51,22 @@ export default function StackedBarViz({
       type: 'category',
       data: xLabels,
       ...figmaAxisStyle(),
-      axisLabel: { color: '#9292C1', fontSize: compact ? 9 : 12 },
+      axisLabel: { color: '#9292C1', fontSize: compact ? 14 : 16 },
     },
     yAxis: {
       type: 'value',
       max: Math.ceil(maxVal / 50) * 50,
       ...figmaAxisStyle(),
-      axisLabel: { color: '#9292C1', fontSize: compact ? 9 : 12 },
+      axisLabel: { color: '#9292C1', fontSize: compact ? 14 : 16 },
     },
     legend: compact
       ? {
           data: [...SCHOOL_TYPES],
           top: 0,
-          right: 0,
-          itemWidth: 8,
-          itemHeight: 8,
-          textStyle: { color: '#9292C1', fontSize: 9 },
+          left: 'center',
+          itemWidth: 12,
+          itemHeight: 12,
+          textStyle: { color: '#9292C1', fontSize: 14 },
         }
       : undefined,
     series,

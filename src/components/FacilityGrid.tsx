@@ -49,7 +49,7 @@ function Cell({ t, i, c, p, appearClass, children }: { t: string; i: string; c: 
 }
 
 export default function FacilityGrid({ data }: { data: DashboardData }) {
-  const r2 = useRef<HTMLDivElement>(null), r3 = useRef<HTMLDivElement>(null), r4 = useRef<HTMLDivElement>(null);
+  const r2 = useRef<HTMLDivElement>(null), r3 = useRef<HTMLDivElement>(null);
   const ct = useRef<HTMLDivElement>(null);
   useEffect(() => { gsap.fromTo(ct.current, { opacity: 0 }, { opacity: 1, duration: 0.4 }); }, []);
 
@@ -109,32 +109,9 @@ export default function FacilityGrid({ data }: { data: DashboardData }) {
     }],
   });
 
-  const boxData: number[][] = [];
-  const boxNames = subgroups.map(([, g]) => {
-    const vals: number[] = [];
-    stypes.forEach(st => g.keys.forEach(k => { const v = data.cross_analysis[st]?.[k]; if (v != null && v > 0) vals.push(v); }));
-    vals.sort((a, b) => a - b);
-    if (vals.length < 2) { boxData.push([0, 0, 0, 0, 0]); return g.name; }
-    const q1 = vals[Math.floor(vals.length * 0.25)];
-    const q3 = vals[Math.floor(vals.length * 0.75)];
-    const med = vals[Math.floor(vals.length * 0.5)];
-    boxData.push([vals[0], q1, med, q3, vals[vals.length - 1]]);
-    return g.name;
-  });
-  useEcharts(r4, {
-    backgroundColor: 'transparent',
-    animation: true, animationDuration: 1200, animationEasing: 'cubicOut',
-    tooltip: { trigger: 'item', backgroundColor: '#FFFFFF', borderColor: '#E8ECF4', borderWidth: 1, textStyle: { color: '#383874', fontSize: 11 } },
-    grid: buildSideLegendGrid({ left: "8%", top: "4%" }),
-    xAxis: { type: 'category', data: boxNames, axisLabel: { color: '#9292C1', fontSize: 8, interval: 0 }, axisTick: { show: false } },
-    yAxis: { type: 'value', name: '得分率', nameTextStyle: { color: '#9292C1', fontSize: 9 }, axisLabel: { color: '#9292C1', fontSize: 9, formatter: (v: number) => (v * 100).toFixed(0) + '%' }, splitLine: { lineStyle: { color: '#F2F5FA' } } },
-    series: [{ type: 'boxplot', data: boxData, itemStyle: { color: 'rgba(0,212,255,0.15)', borderColor: '#66C8FF', borderWidth: 2 }, boxWidth: [10, 25] }],
-  });
-
   const cells = [
     { r: r3, t: '硬件指标三维分析', i: '🫧', c: '#FFBA69', delay: 'chart-appear-delay-1', insightIndex: 0 },
     { r: r2, t: '七维度×三类学校', i: '🔥', c: '#66C8FF', delay: 'chart-appear-delay-2', insightIndex: 1 },
-    { r: r4, t: '七维度指标分布', i: '📦', c: '#8676FF', delay: 'chart-appear-delay-3', insightIndex: 3 },
   ];
 
   return (

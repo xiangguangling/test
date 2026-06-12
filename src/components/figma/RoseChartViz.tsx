@@ -23,8 +23,8 @@ export default function RoseChartViz({
       series={radar.series}
       className={`chart-card--radar${hero || heroHalf ? ' chart-card--fill' : ''}${heroHalf ? ' chart-card--rose-half' : ''}`}
       fillAxis={heroHalf ? 'width' : 'contain'}
-      scaleBoost={1}
-      compact={heroHalf}
+      scaleBoost={heroHalf ? 1.8 : 1}
+      compact={false}
       insight={getTop6WeaknessRadarInsight(data)}
     />
   );
