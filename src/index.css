@@ -1161,14 +1161,6 @@ body {
 .import-section-desc { font-family: 'Roboto', sans-serif; font-size: 12px; color: var(--color-text-secondary); margin-bottom: 16px; }
 .import-divider { border: none; border-top: 1px solid var(--color-border-light); margin: 8px 0 20px; }
 .grid-backup-section { margin-top: 8px; }
-.overview-backup-section {
-  margin-top: 32px;
-  padding-top: 24px;
-  padding-bottom: 24px;
-  border-top: 1px solid var(--color-border-light);
-  scroll-snap-align: start;
-  scroll-snap-stop: normal;
-}
 .overview-backup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .overview-backup-grid--triple {
   grid-template-columns: repeat(3, minmax(0, 1fr));
