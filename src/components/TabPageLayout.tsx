@@ -39,7 +39,6 @@ export default function TabPageLayout({
       el.style.setProperty('--tab-snap-pad-top', `${padTop}px`);
       el.style.setProperty('--tab-snap-safe-bottom', `${safeBottom}px`);
       el.style.setProperty('--tab-snap-section-height', `${sectionH}px`);
-      requestAnimationFrame(() => window.dispatchEvent(new Event('resize')));
     };
 
     syncSnapLayout();
