@@ -35,13 +35,11 @@ npm run preview
 
 ### GitHub Pages（推荐）
 
-本仓库已配置 `.github/workflows/deploy.yml`：推送到 `master` 分支后，GitHub Actions 自动执行 `npm ci` → `npm run build` → 发布 `dist/` 到 Pages。
+1. 在仓库根目录创建 `.github/workflows/deploy.yml`（内容见 [`docs/deploy-workflow.yml`](docs/deploy-workflow.yml)）
+2. 打开 **Settings → Pages**，**Source** 选择 **GitHub Actions**
+3. 推送到 `master` 后 Actions 自动构建并发布
 
-**首次启用：**
-
-1. 打开 GitHub 仓库 **Settings → Pages**
-2. **Source** 选择 **GitHub Actions**
-3. 推送代码到 `master` 后等待 workflow 完成
+> 若本地 `git push` 提示缺少 `workflow` 权限，请在 GitHub 网页端新建 workflow 文件，或为 Personal Access Token 勾选 `workflow` scope。
 
 **Base 路径：** `vite.config.ts` 在 CI 环境使用 `base: '/test/'`，与仓库名 `xiangguangling/test` 对应。若更换仓库名，需同步修改 `base`。
 
