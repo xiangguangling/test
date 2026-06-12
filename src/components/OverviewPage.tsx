@@ -12,7 +12,10 @@ import SankeyPassFlow from './SankeyPassFlow';
 import IndicatorRadar from './IndicatorRadar';
 import ConcentricRadialViz from './figma/ConcentricRadialViz';
 import SchoolTypeComparison from './SchoolTypeComparison';
-import OverviewBackupSection from './OverviewBackupSection';
+import WeaknessBars from './WeaknessBars';
+import UrbanRuralHeatmap from './UrbanRuralHeatmap';
+import BottomSchoolsList from './BottomSchoolsList';
+import RadialTreeViz from './RadialTreeViz';
 import { OverviewScrollContext } from '../contexts/OverviewScrollContext';
 
 function OverviewSnapSection({
