@@ -1,6 +1,6 @@
-﻿import { useEffect, useRef } from 'react';
+﻿import { useMemo, useEffect, useRef } from 'react';
 import * as echarts from 'echarts/core';
-import { BarChart } from 'echarts/charts';
+import { BarChart, ScatterChart } from 'echarts/charts';
 import { GridComponent, TooltipComponent, LegendComponent } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
 import gsap from 'gsap';
@@ -9,110 +9,225 @@ import FlipCard from './FlipCard';
 import InsightBack from './InsightBack';
 import { getSafetyGridInsight } from './ChartInsights';
 import { useEcharts } from '../hooks/useEcharts';
-import { buildSideLegend, buildSideLegendGrid } from '../utils/chartLegend';
 
-echarts.use([BarChart, GridComponent, TooltipComponent, LegendComponent, CanvasRenderer]);
+echarts.use([BarChart, ScatterChart, GridComponent, TooltipComponent, LegendComponent, CanvasRenderer]);
 
-const catAIndicators = [
-  { key: 'A1.1得分率', name: '班级数与班额数', group: 'A1.教学规模' },
-  { key: 'A1.2得分率', name: '学生总数', group: 'A1.教学规模' },
-  { key: 'A2.1得分率', name: '卫生保健室', group: 'A2.校园卫生' },
-  { key: 'A2.2.1得分率', name: '食堂等级达标', group: 'A2.校园卫生' },
-  { key: 'A2.2.2得分率', name: '小卖部达标', group: 'A2.校园卫生' },
-  { key: 'A2.3.1得分率', name: '饮用水卫生', group: 'A2.校园卫生' },
-  { key: 'A2.3.2得分率', name: '厕所卫生', group: 'A2.校园卫生' },
-  { key: 'A3.1.2得分率', name: '出入口安全', group: 'A3.校园安全' },
-  { key: 'A3.1.1得分率', name: '危房情况', group: 'A3.校园安全' },
-  { key: 'A3.2.1得分率', name: '保卫人员', group: 'A3.校园安全' },
-  { key: 'A3.2.2得分率', name: '宿舍管理员', group: 'A3.校园安全' },
+const A_INDICATORS = [
+  { key: 'A1.1得分率', name: '班级与班额' },
+  { key: 'A1.2得分率', name: '学生总数' },
+  { key: 'A2.1得分率', name: '卫生保健室' },
+  { key: 'A2.2.1得分率', name: '食堂达标' },
+  { key: 'A2.2.2得分率', name: '小卖部达标' },
+  { key: 'A2.3.1得分率', name: '饮用水卫生' },
+  { key: 'A2.3.2得分率', name: '厕所卫生' },
+  { key: 'A3.1.2得分率', name: '出入口安全' },
+  { key: 'A3.1.1得分率', name: '危房排查' },
+  { key: 'A3.2.1得分率', name: '保卫人员' },
+  { key: 'A3.2.2得分率', name: '宿舍管理员' },
 ];
 
-function Cell({ t, i, c, p, appearClass, children }: { t: string; i: string; c: string; p?: string; appearClass?: string; children: React.ReactNode }) {
+function Cell({ t, i, c, children }: { t: string; i: string; c: string; children: React.ReactNode }) {
   return (
-    <div className={`card-border chart-panel p-3 flex flex-col relative h-full${appearClass ? ` ${appearClass}` : ""}`} style={{ minHeight: 0 }}>
+    <div className="card-border chart-panel p-3 flex flex-col relative h-full" style={{ minHeight: 0 }}>
       <span className="flip-hint" title="点击空白处翻转查看结论">⇄</span>
       <h3 className="text-xs font-semibold text-text-primary mb-1.5 flex items-center justify-center gap-1.5 flex-shrink-0 pr-6">
         <span style={{ color: c }}>{i}</span><span className="text-center">{t}</span>
       </h3>
       <div className="flex-1 relative" style={{ minHeight: 0 }}>{children}</div>
-      {p && <p className="text-[10px] text-text-muted text-center mt-1 flex-shrink-0">{p}</p>}
     </div>
   );
 }
 
 export default function SafetyGrid({ data }: { data: DashboardData }) {
-  const r1 = useRef<HTMLDivElement>(null), r3 = useRef<HTMLDivElement>(null);
+  const r1 = useRef<HTMLDivElement>(null);
+  const r2 = useRef<HTMLDivElement>(null);
   const ct = useRef<HTMLDivElement>(null);
-  useEffect(() => { gsap.fromTo(ct.current, { opacity: 0 }, { opacity: 1, duration: 0.4 }); }, []);
 
-  const stypes = ['小学', '初中', '九年制'];
-  const scolors = ['#8676FF', '#FF708B', '#66C8FF'];
+  useEffect(() => { gsap.fromTo(ct.current, { opacity: 0 }, { opacity: 1, duration: 0.5 }); }, []);
 
-  const failBars = catAIndicators
-    .map(ind => { const f = data.indicators.find(i => i.key === ind.key); return { name: ind.name, group: ind.group, fail: f?.fail_count ?? 0, rate: f ? +(f.avg_rate * 100).toFixed(1) : 100 }; })
-    .filter(d => d.fail > 0)
-    .sort((a, b) => b.fail - a.fail);
-  const maxFail = Math.max(...failBars.map(d => d.fail), 1);
+  // ===== 左：不达标风险气泡图 =====
+  const bubbleData = useMemo(() => {
+    return A_INDICATORS.map(meta => {
+      const ind = data.indicators.find(i => i.key === meta.key);
+      const failCount = ind?.fail_count ?? 0;
+      const failPct = ind?.fail_pct ?? 0;
+      const rate = ind ? +(ind.avg_rate * 100).toFixed(1) : 100;
+      // risk level: 1=low, 2=medium, 3=high
+      const risk = failPct > 1.5 ? 3 : failPct > 0.3 ? 2 : 1;
+      return {
+        name: meta.name,
+        value: [failCount, failPct, failCount || 1],
+        rate,
+        risk,
+      };
+    });
+  }, [data]);
+
   useEcharts(r1, {
     backgroundColor: 'transparent',
-    animation: true, animationDuration: 1400, animationEasing: 'cubicOut',
-    tooltip: { trigger: 'axis', backgroundColor: '#FFFFFF', borderColor: '#E8ECF4', borderWidth: 1, textStyle: { color: '#383874', fontSize: 11 }, formatter: (p: unknown) => { const pa = p as { name: string; value: number; data: { rate: number } }[]; if (!pa?.length) return ''; const d = pa[0]; return `<b>${d.name}</b><br/>不达标: <b>${d.value}</b> 所<br/>得分率: <b>${d.data.rate}%</b>`; } },
-    grid: { left: '3%', right: '10%', top: '3%', bottom: '3%', containLabel: true },
-    xAxis: { type: 'value', name: '不达标学校数（所）', nameTextStyle: { color: '#9292C1', fontSize: 9 }, axisLabel: { color: '#9292C1', fontSize: 9 }, splitLine: { lineStyle: { color: '#F2F5FA' } }, max: maxFail * 1.3 },
-    yAxis: { type: 'category', data: failBars.map(d => d.name), axisLabel: { color: '#9292C1', fontSize: 10 }, axisLine: { show: false }, axisTick: { show: false }, inverse: true },
+    animation: true,
+    animationDuration: 1400,
+    animationEasing: 'cubicOut',
+    tooltip: {
+      trigger: 'item' as const,
+      backgroundColor: '#FFFFFF',
+      borderColor: '#E8ECF4',
+      textStyle: { color: '#383874', fontSize: 12 },
+      formatter: (p: any) => {
+        const d = p.data;
+        if (!d) return '';
+        const riskLabel = d.risk === 3 ? '⚠️ 高风险' : d.risk === 2 ? '🔶 中风险' : '✅ 低风险';
+        return `<b>${d.name}</b><br/>不达标: <b>${d.value[0]}</b> 所<br/>不达标率: <b>${d.value[1].toFixed(1)}%</b><br/>得分率: <b>${d.rate}%</b><br/>${riskLabel}`;
+      },
+    },
+    grid: { left: '10%', right: '8%', top: '8%', bottom: '8%' },
+    xAxis: {
+      type: 'value' as const,
+      name: '不达标学校数（所）',
+      nameTextStyle: { color: '#9292C1', fontSize: 10 },
+      axisLabel: { color: '#9292C1', fontSize: 10 },
+      splitLine: { lineStyle: { color: '#F2F5FA', type: 'dashed' as const } },
+      max: Math.max(...bubbleData.map(d => d.value[0]), 1) * 1.3,
+    },
+    yAxis: {
+      type: 'value' as const,
+      name: '不达标率 (%)',
+      nameTextStyle: { color: '#9292C1', fontSize: 10 },
+      axisLabel: { color: '#9292C1', fontSize: 10, formatter: '{value}%' },
+      splitLine: { lineStyle: { color: '#F2F5FA', type: 'dashed' as const } },
+      max: Math.max(...bubbleData.map(d => d.value[1]), 1) * 1.3,
+    },
     series: [{
-      type: 'bar',
-      barWidth: '55%',
-      data: failBars.map(d => ({
-        value: d.fail,
+      type: 'scatter' as const,
+      symbolSize: (val: number[]) => Math.max(10, Math.min(60, (val[2] || 1) * 2.5)),
+      data: bubbleData.map(d => ({
+        ...d,
         itemStyle: {
-          borderRadius: [0, 6, 6, 0],
-          color: d.fail > 50 ? new echarts.graphic.LinearGradient(0, 0, 1, 0, [{ offset: 0, color: '#FF2D2E' }, { offset: 1, color: '#FFBA69' }])
-            : d.fail > 10 ? new echarts.graphic.LinearGradient(0, 0, 1, 0, [{ offset: 0, color: '#FFBA69' }, { offset: 1, color: '#FFBA69' }])
-            : new echarts.graphic.LinearGradient(0, 0, 1, 0, [{ offset: 0, color: '#FFBA69' }, { offset: 1, color: '#00B929' }]),
+          color: d.risk === 3
+            ? new echarts.graphic.RadialGradient(0.4, 0.3, 1, [
+                { offset: 0, color: '#FF708B' }, { offset: 1, color: '#FF708B44' },
+              ])
+            : d.risk === 2
+            ? new echarts.graphic.RadialGradient(0.4, 0.3, 1, [
+                { offset: 0, color: '#FFBA69' }, { offset: 1, color: '#FFBA6944' },
+              ])
+            : new echarts.graphic.RadialGradient(0.4, 0.3, 1, [
+                { offset: 0, color: '#00B929' }, { offset: 1, color: '#00B92944' },
+              ]),
+          shadowBlur: 8,
+          shadowColor: 'rgba(0,0,0,0.08)',
         },
-        rate: d.rate,
       })),
-      label: { show: true, position: 'right', color: '#383874', fontSize: 11, fontWeight: 'bold', formatter: (p: { value: number }) => p.value + '所' },
+      label: {
+        show: true,
+        position: 'right' as const,
+        color: '#383874',
+        fontSize: 10,
+        formatter: (p: any) => p.data.value[0] > 0 ? p.data.name : '',
+      },
+      emphasis: {
+        scale: 1.4,
+        focus: 'self' as const,
+      },
     }],
   });
 
-  const coreKeys = ['A1.1得分率', 'A1.2得分率', 'A2.1得分率', 'A2.2.1得分率', 'A3.1.1得分率', 'A3.2.1得分率'];
-  const coreNames = ['班级班额', '学生总数', '卫生保健室', '食堂达标', '危房排查', '保卫人员'];
-  const coreData = coreKeys.map((k, idx) => {
-    const vals = stypes.map(st => {
-      const cr = data.cross_analysis[st]?.[k];
-      return cr != null ? +((1 - cr) * 100).toFixed(2) : 0;
-    });
-    return { name: coreNames[idx], key: k, vals, totalFail: vals.reduce((a, b) => a + b, 0) };
-  }).filter(d => d.totalFail > 0.01)
-    .sort((a, b) => b.totalFail - a.totalFail);
+  // ===== 右：三类学校不达标分布 — 分组柱状图 =====
+  const stypes = ['小学', '初中', '九年制'] as const;
+  const stColors = ['#8676FF', '#FF708B', '#66C8FF'];
+  
+  // 从 cross_analysis 计算每类学校每项指标的不达标学校数
+  const failByType = useMemo(() => {
+    // 估算每类学校总数
+    const typeCounts: Record<string, number> = {};
+    for (const st of stypes) {
+      typeCounts[st] = data.by_school_type[st]?.count ?? 1;
+    }
+    return A_INDICATORS.map(meta => {
+      const vals = stypes.map(st => {
+        const rate = data.cross_analysis[st]?.[meta.key] ?? 1;
+        // 不达标学校数 ≈ 总数 × (1 - 得分率)
+        return Math.round(typeCounts[st] * (1 - rate));
+      });
+      return { name: meta.name, vals, total: vals.reduce((a, b) => a + b, 0) };
+    }).filter(d => d.total > 0)
+      .sort((a, b) => b.total - a.total);
+  }, [data]);
 
-  const coreMaxPct = Math.max(...coreData.flatMap(d => d.vals), 5);
-  useEcharts(r3, {
+  const maxFailVal = Math.max(...failByType.flatMap(d => d.vals), 1);
+
+  useEcharts(r2, {
     backgroundColor: 'transparent',
-    animation: true, animationDuration: 1400, animationEasing: 'cubicOut',
-    tooltip: { trigger: 'axis', backgroundColor: '#FFFFFF', borderColor: '#E8ECF4', borderWidth: 1, textStyle: { color: '#383874', fontSize: 11 }, formatter: (p: unknown) => { const pa = p as { seriesName: string; value: number; axisValue: string }[]; if (!pa?.length) return ''; return `<b>${pa[0].axisValue}</b><br/>${pa.map(s => `${s.seriesName}: <b>${s.value.toFixed(1)}%</b>`).join('<br/>')}`; } },
-    legend: buildSideLegend(stypes),
-    grid: buildSideLegendGrid({ top: '6%' }),
-    xAxis: { type: 'value', name: '不达标率 (%)', nameTextStyle: { color: '#9292C1', fontSize: 9 }, axisLabel: { color: '#9292C1', fontSize: 9, formatter: '{value}%' }, splitLine: { lineStyle: { color: '#F2F5FA' } }, max: coreMaxPct * 1.3 },
-    yAxis: { type: 'category', data: coreData.map(d => d.name), axisLabel: { color: '#383874', fontSize: 11 }, axisLine: { show: false }, axisTick: { show: false } },
-    series: stypes.map((st, i) => ({
-      name: st, type: 'bar', barWidth: '22%', barGap: '10%',
+    animation: true,
+    animationDuration: 1400,
+    animationEasing: 'cubicOut',
+    tooltip: {
+      trigger: 'axis' as const,
+      backgroundColor: '#FFFFFF',
+      borderColor: '#E8ECF4',
+      textStyle: { color: '#383874', fontSize: 12 },
+      formatter: (p: any) => {
+        if (!p?.length) return '';
+        const total = p.reduce((s: number, item: any) => s + (item.value || 0), 0);
+        return `<b>${p[0].axisValue}</b><br/>${p.map((s: any) => 
+          `${s.marker} ${s.seriesName}: <b>${s.value}所</b>`
+        ).join('<br/>')}<hr style="margin:4px 0;border:none;border-top:1px solid #e8ecf4"/>合计不达标: <b>${total}所</b>`;
+      },
+    },
+    legend: {
+      data: [...stypes],
+      bottom: 0,
+      textStyle: { color: '#383874', fontSize: 11 },
+      itemWidth: 10,
+      itemHeight: 10,
+    },
+    grid: { left: '3%', right: '10%', top: '6%', bottom: '14%', containLabel: true },
+    xAxis: {
+      type: 'value' as const,
+      name: '不达标学校数（所）',
+      nameTextStyle: { color: '#9292C1', fontSize: 10 },
+      axisLabel: { color: '#9292C1', fontSize: 10 },
+      splitLine: { lineStyle: { color: '#F2F5FA', type: 'dashed' as const } },
+      max: maxFailVal * 1.4,
+    },
+    yAxis: {
+      type: 'category' as const,
+      data: failByType.map(d => d.name),
+      axisLabel: { color: '#383874', fontSize: 11 },
+      axisLine: { show: false },
+      axisTick: { show: false },
+      inverse: true,
+    },
+    series: stypes.map((st, si) => ({
+      name: st,
+      type: 'bar' as const,
+      barWidth: '20%',
+      barGap: '12%',
       itemStyle: {
-        borderRadius: [0, 4, 4, 0],
+        borderRadius: [0, 6, 6, 0],
         color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
-          { offset: 0, color: scolors[i] + 'cc' }, { offset: 1, color: scolors[i] + '44' },
+          { offset: 0, color: stColors[si] },
+          { offset: 1, color: stColors[si] + '44' },
         ]),
       },
-      label: { show: true, position: 'right', color: '#383874', fontSize: 9, formatter: (p: { value: number }) => p.value > 0.05 ? p.value.toFixed(1) + '%' : '' },
-      data: coreData.map(d => d.vals[i]),
+      label: {
+        show: true,
+        position: 'right' as const,
+        color: '#383874',
+        fontSize: 9,
+        fontWeight: 'bold' as const,
+        formatter: (p: any) => p.value > 0 ? p.value : '',
+      },
+      emphasis: {
+        itemStyle: { color: stColors[si] },
+      },
+      data: failByType.map(d => d.vals[si]),
     })),
   });
 
   const cells = [
-    { r: r1, t: '不达标指标排名', i: '🔴', c: '#FF2D2E', delay: 'chart-appear-delay-1', insightIndex: 0 },
-    { r: r3, t: '核心指标不达标率 · 三类学校对比', i: '🔍', c: '#FFBA69', delay: 'chart-appear-delay-2', insightIndex: 2 },
+    { r: r1, t: '不达标风险矩阵', i: '🔴', c: '#FF2D2E', insightIndex: 0 },
+    { r: r2, t: '三类学校不达标分布', i: '🏫', c: '#8676FF', insightIndex: 2 },
   ];
 
   return (
@@ -124,7 +239,7 @@ export default function SafetyGrid({ data }: { data: DashboardData }) {
             <FlipCard
               key={i}
               front={
-                <Cell t={item.t} i={item.i} c={item.c} appearClass={`chart-appear ${item.delay}`}>
+                <Cell t={item.t} i={item.i} c={item.c}>
                   <div ref={item.r} className="chart-embed-canvas" />
                 </Cell>
               }

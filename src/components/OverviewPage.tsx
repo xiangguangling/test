@@ -46,18 +46,13 @@ export default function OverviewPage({
 
     const syncSnapLayout = () => {
       const kpiH = kpi.offsetHeight;
-      if (kpiH < 1) return;
+      if (kpiH < 1 || !el) return;
 
-      const titleH = document.querySelector('.page-title-banner')?.getBoundingClientRect().height ?? 110;
-      const footerH = document.querySelector('.app-footer')?.getBoundingClientRect().height ?? 36;
-      const padTop = 10;
-      const safeBottom = 14;
-      const viewport = Math.max(320, window.innerHeight - titleH - footerH - kpiH);
-      const sectionH = Math.max(280, viewport - padTop - safeBottom);
+      const sectionH = Math.max(280, el.clientHeight - kpiH);
 
       el.style.setProperty('--overview-kpi-block', `${kpiH}px`);
-      el.style.setProperty('--overview-snap-pad-top', `${padTop}px`);
-      el.style.setProperty('--overview-snap-safe-bottom', `${safeBottom}px`);
+      el.style.setProperty('--overview-snap-pad-top', `10px`);
+      el.style.setProperty('--overview-snap-safe-bottom', `0px`);
       el.style.setProperty('--overview-snap-section-height', `${sectionH}px`);
     };
 

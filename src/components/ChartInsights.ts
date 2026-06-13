@@ -554,6 +554,28 @@ export function getSafetyBarInsight(data: DashboardData): ChartInsight {
   };
 }
 
+/** "三类学校安全雷达" — 安全雷达图 */
+export function getSafetyRadarInsight(data: DashboardData): ChartInsight {
+  const aInds = data.indicators.filter(i => i.category === 'A类-学校管理与安全' && i.key !== '得分率');
+  const avgSafety = aInds.reduce((s, i) => s + i.avg_rate, 0) / (aInds.length || 1);
+  const stypes = ['小学', '初中', '九年制'] as const;
+  const scores = stypes.map(st => {
+    const vals = aInds.map(i => data.cross_analysis[st]?.[i.key] ?? 1);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const bestSt = stypes[scores.indexOf(Math.max(...scores))];
+  const perfectCount = aInds.filter(i => i.avg_rate >= 1).length;
+  return {
+    icon: '🎯',
+    title: '三类学校安全雷达解读',
+    bigNumber: fmtPct(avgSafety),
+    bigNumberColor: 'emerald',
+    unit: '% 安全均分',
+    description: `三类学校在${aInds.length}项安全指标上的雷达对比：${bestSt}整体表现最优，三类学校曲线高度重合说明安全管理标准化程度极高。${perfectCount}项指标已实现100%达标（饮用水、厕所、出入口、宿舍管理、小卖部）。`,
+    tag: { text: `${perfectCount}项100%达标`, type: 'good' },
+  };
+}
+
 // ===== 硬件设施页洞察 =====
 
 /** "B类硬件指标得分" — 硬件柱状图 */

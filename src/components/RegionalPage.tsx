@@ -6,6 +6,7 @@ import ChartCard from './ChartCard';
 import FigmaRadarChartPanel from './figma/FigmaRadarChartPanel';
 import { buildRegionalRadar } from './figma/figmaRadarData';
 import RegionalGrid from './RegionalGrid';
+import DandelionViz from './DandelionViz';
 import TabPageLayout, { TabSnapSection } from './TabPageLayout';
 import {
   getRegionalBarInsight,
@@ -77,6 +78,12 @@ export default function RegionalPage({ data }: { data: DashboardData }) {
         </div>
       )}
     >
+      <TabSnapSection>
+        <div>
+          <DandelionViz />
+        </div>
+      </TabSnapSection>
+
       <TabSnapSection>
         <div className="tab-snap-section--split">
           <ChartCard title="城乡关键指标对比" insight={getRegionalBarInsight(data)}>

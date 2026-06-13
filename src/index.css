@@ -810,7 +810,7 @@ body {
 .overview-snap-section--stacked-bar {
   grid-template-columns: 1fr 1fr;
   align-items: stretch;
-  padding-bottom: 24px;
+  padding-bottom: 38px;
 }
 .overview-snap-section--stacked-bar .overview-chart-cell {
   min-width: 0;
@@ -870,6 +870,7 @@ body {
   text-align: center;
   padding-left: 36px;
   padding-right: 36px;
+  padding-top: 3px;
   flex-shrink: 0;
 }
 .overview-snap-section--triple .overview-chart-body {
@@ -1087,6 +1088,7 @@ body {
 .grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 .grid-3col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
 .grid-4col { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.grid-5col { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
 
 /* Data Table */
 .data-table { width: 100%; border-collapse: collapse; font-family: 'Roboto',sans-serif; font-size: 13px; }
