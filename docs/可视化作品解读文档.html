@@ -5,10 +5,11 @@
 <title>义务教育标准化学校监测数据可视化看板 - 可视化作品解读文档</title>
 <style>
 @page { size: A4; margin: 2cm; }
-body { font-family: "SimSun", "Microsoft YaHei", sans-serif; font-size: 12pt; line-height: 1.8; color: #333; max-width: 900px; margin: 0 auto; padding: 20px; }
+body { font-family: "SimSun", "Microsoft YaHei", sans-serif; font-size: 12pt; line-height: 1.8; color: #333; }
 h1 { font-size: 20pt; text-align: center; border-bottom: 3px solid #1a5276; padding-bottom: 12px; margin-bottom: 24px; color: #1a5276; }
 h2 { font-size: 15pt; border-left: 4px solid #2980b9; padding-left: 10px; margin-top: 28px; color: #1a5276; }
 h3 { font-size: 13pt; color: #2c3e50; margin-top: 18px; }
+h4 { font-size: 12pt; color: #2c3e50; margin-top: 18px; }
 table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 10pt; }
 th { background: #2980b9; color: white; padding: 8px 10px; text-align: left; }
 td { border: 1px solid #ddd; padding: 6px 10px; }
@@ -18,122 +19,156 @@ ul, ol { margin: 8px 0; padding-left: 24px; }
 li { margin: 4px 0; }
 code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; font-size: 10pt; }
 blockquote { border-left: 3px solid #2980b9; padding: 8px 16px; margin: 12px 0; background: #f0f7fb; }
-.note { background: #fff3cd; border: 1px solid #ffc107; padding: 8px 16px; margin: 12px 0; border-radius: 4px; }
 </style>
 </head>
 <body>
-<h1>义务教育标准化学校监测数据可视化看板<br><small style="font-size:11pt;color:#888;">可视化作品解读文档 v2.0</small></h1>
-
+<h1>义务教育标准化学校监测数据可视化看板<br><small style="font-size:11pt;color:#888;">可视化作品解读文档</small></h1>
 <h2>一、场景需求</h2>
 <h3>1.1 主题定位</h3>
-<p>聚焦温州市855所义务教育阶段学校在<strong>安全管理、硬件设施、师资队伍</strong>三大维度的标准化达标情况，为教育管理者提供"一屏知全局"的决策支持工具。</p>
-
+<p>本可视化作品以<strong>"义务教育标准化学校监测"</strong>为主题，聚焦温州市855所义务教育阶段学校在<strong>安全管理、硬件设施、师资队伍</strong>三大核心维度的标准化达标情况。作品通过交互式数据看板，将复杂的教育监测指标转化为直观的可视化图表，为教育管理者提供"一屏知全局"的决策支持工具。</p>
 <h3>1.2 应用场景</h3>
 <ul>
-<li><strong>教育督导</strong>：快速掌握区域达标态势，精准识别薄弱学校</li>
-<li><strong>资源配置</strong>：依据数据制定硬件投入、师资调配计划</li>
-<li><strong>校际对比</strong>：横向对比不同办学类型和城乡区域差异</li>
-<li><strong>年度汇报</strong>：以可视化形式呈现监测成果</li>
+<li><strong>教育督导场景</strong>：市县两级教育行政部门开展义务教育标准化学校督导评估时，通过看板快速掌握区域整体达标态势</li>
+<li><strong>资源配置决策场景</strong>：教育局在制定学校硬件建设投入、师资调配计划时，依据数据精准识别薄弱学校和短板指标</li>
+<li><strong>校际对比分析场景</strong>：学区管理者横向对比不同办学类型（小学/初中/九年制）和城乡区域（城市/县镇/农村）的差异</li>
+<li><strong>年度考核汇报场景</strong>：教育系统年度工作总结时，以可视化形式呈现监测成果</li>
 </ul>
-
+<h3>1.3 解决的问题</h3>
+<ol>
+<li><strong>信息过载</strong>：44项指标的855所学校数据量庞大，传统报表难以快速提取关键信息</li>
+<li><strong>维度割裂</strong>：安全管理、硬件设施、师资队伍分属不同业务科室，缺乏全局视角</li>
+<li><strong>城乡差异隐形</strong>：城市、县镇、农村三类区域的资源配置差异难以直观发现</li>
+<li><strong>短板定位困难</strong>：管理者难以迅速锁定最需关注的学校和不达标指标</li>
+</ol>
 <h2>二、数据集说明</h2>
-<h3>2.1 数据规模</h3>
-<table>
-<tr><th>维度</th><th>数量</th></tr>
-<tr><td>学校总数</td><td>855所（小学531 / 初中229 / 九年制95）</td></tr>
-<tr><td>城乡分组</td><td>城市436 / 县镇272 / 农村147</td></tr>
-<tr><td>监测指标</td><td>44项（A类安全11 + B类硬件20 + C类师资13）</td></tr>
-</table>
+<h3>2.1 数据来源</h3>
+<p>数据集来源于<strong>《义务教育标准化学校统计监测数据》</strong>，包含温州市855所义务教育阶段学校的逐校逐项监测数据。</p>
+<h3>2.2 数据规模</h3>
+<table><thead><tr><th>维度</th><th>数量</th></tr></thead><tbody>
+<tr><td>学校总数</td><td>855所</td></tr>
+<tr><td>小学</td><td>531所</td></tr>
+<tr><td>初中</td><td>229所</td></tr>
+<tr><td>九年一贯制</td><td>95所</td></tr>
+<tr><td>城市学校</td><td>436所</td></tr>
+<tr><td>县镇学校</td><td>272所</td></tr>
+<tr><td>农村学校</td><td>147所</td></tr>
+<tr><td>监测指标</td><td>44项（A类安全11项 + B类硬件20项 + C类师资13项）</td></tr>
+</tbody></table>
+<h3>2.3 数据关联结构</h3>
+<pre><code>原始Excel（855行 x 105列）
+  |-- 学校元数据（15列）：标识码、名称、办学类型、城乡分组、区划等
+  |-- 综合得分（2列）：总分（满分44分）、综合得分率
+  |-- A类-学校管理与安全（22列）：11项指标 x（原始分+得分率）
+  |-- B类-办学硬件与环境（40列）：20项指标 x（原始分+得分率）
+  |-- C类-师资队伍与发展（26列）：13项指标 x（原始分+得分率）
 
-<h3>2.2 关键计算字段</h3>
-<table>
-<tr><th>字段</th><th>计算</th><th>意义</th></tr>
-<tr><td>avg_rate</td><td>各校得分率算术平均</td><td>整体达标水平</td></tr>
-<tr><td>fail_count</td><td>未完全达标的学校数</td><td>短板严重程度</td></tr>
-<tr><td>fail_pct</td><td>fail_count / 学校总数</td><td>标准化不达标比例</td></tr>
-<tr><td>cross_analysis</td><td>办学类型 × 指标得分率矩阵</td><td>学段差异</td></tr>
-<tr><td>urban_rural_analysis</td><td>城乡 × 指标得分率矩阵</td><td>城乡差异</td></tr>
-<tr><td>category_summary</td><td>同类指标二次平均</td><td>宏观维度水平</td></tr>
-</table>
+| generate_data.py 聚合计算 |
 
-<h2>三、核心可视化组件（共20+个）</h2>
-
-<h3>3.1 总体概览页（7个组件）</h3>
-<table>
-<tr><th>#</th><th>组件</th><th>类型</th><th>功能</th></tr>
-<tr><td>1</td><td>三大维度环形仪表盘</td><td>ConcentricRadialViz</td><td>一层一维度，弧形进度条对比A/B/C三类达标率</td></tr>
-<tr><td>2</td><td>44项指标层级结构</td><td>RadialTreeViz 放射树</td><td>类别→子组→单项三层拓扑，节点颜色编码达标等级</td></tr>
-<tr><td>3</td><td>三类学校得分率堆叠柱状图</td><td>StackedBarViz</td><td>小学/初中/九年制在44项指标上的分层对比</td></tr>
-<tr><td>4</td><td>得分率玫瑰图</td><td>RoseChartViz</td><td>南丁格尔图展示分数段构成，面积=学校数</td></tr>
-<tr><td>5</td><td>Sankey流向图</td><td>SankeyPassFlow</td><td>办学类型→城乡→得分区间流转路径</td></tr>
-<tr><td>6</td><td>十五项最低得分率指标</td><td>横向柱状图</td><td>红/黄/绿三色，一键定位最薄弱指标</td></tr>
-<tr><td>7</td><td>得分最低二十所学校</td><td>纵向柱状图</td><td>红色警戒线，快速锁定需帮扶学校</td></tr>
-</table>
-
-<h3>3.2 区域分析页（5个组件）</h3>
-<table>
-<tr><th>#</th><th>组件</th><th>类型</th><th>功能</th></tr>
-<tr><td>1</td><td>十二区县指标概览</td><td>DandelionViz Canvas</td><td>12区县蒲公英布局，内外圈+动态粒子呼吸动画</td></tr>
-<tr><td>2</td><td>城乡关键指标对比</td><td>分组柱状图</td><td>8项指标×3区域并列对比，x轴水平自动换行</td></tr>
-<tr><td>3</td><td>八大指标城乡雷达图</td><td>FigmaRadarChartPanel</td><td>11维雷达，曲线重合度反映城乡均衡性</td></tr>
-<tr><td>4</td><td>城乡指标得分率散点分布</td><td>散点图</td><td>30项指标×3区域，类别颜色编码(A绿/B黄/C紫)</td></tr>
-<tr><td>5</td><td>城乡指标趋势折线图</td><td>折线图</td><td>6项核心指标城乡走势，x轴水平显示</td></tr>
-</table>
-
-<h3>3.3 安全管理页（3个组件，三等分布局）</h3>
-<div class="note">安全管理页采用三图表三等分网格布局（grid-3），一屏完整呈现安全监测全貌。</div>
-<table>
-<tr><th>#</th><th>组件</th><th>类型</th><th>功能</th></tr>
-<tr><td>1</td><td>安全指标得分率排名</td><td>横向柱状图</td><td>11项指标升序排列，绿/黄/红渐变色，98%红色警戒线</td></tr>
-<tr><td>2</td><td>三类学校安全雷达</td><td>雷达图(11维)</td><td>小学/初中/九年制安全表现对比，满分100刻度</td></tr>
-<tr><td>3</td><td>三类学校不达标分布</td><td>横向分组柱状图</td><td>每项指标×三类学校的不达标学校数，渐变色柱形</td></tr>
-</table>
-
-<h3>3.4 硬件设施页</h3>
-<table>
-<tr><th>#</th><th>组件</th><th>类型</th><th>功能</th></tr>
-<tr><td>1</td><td>B类硬件指标得分（最低10项）</td><td>纵向柱状图</td><td>红/橙/粉三色渐变，顶部标注%，x轴水平自动换行</td></tr>
-<tr><td>2</td><td>硬件指标校型差异热力图</td><td>Heatmap 20×3</td><td>20项指标×三类学校，x轴标签水平自动换行</td></tr>
-<tr><td>3</td><td>七维度指标分布</td><td>箱线图</td><td>B类7子维度得分率分布，中位数+四分位距</td></tr>
-<tr><td>4</td><td>七维度×三类学校</td><td>Heatmap 7×3</td><td>7维度×3校型，数值为整数</td></tr>
-</table>
-
-<h3>3.5 师资队伍页</h3>
-<table>
-<tr><th>#</th><th>组件</th><th>类型</th><th>功能</th></tr>
-<tr><td>1</td><td>师资指标校型差异热力图</td><td>Heatmap 13×3</td><td>13项指标×三类学校，x轴标签水平自动换行</td></tr>
-<tr><td>2</td><td>师资指标得分排序</td><td>棒棒糖图</td><td>柱+散点组合，降序排列，颜色编码达标等级</td></tr>
-<tr><td>3</td><td>六维度×三类学校</td><td>Heatmap 6×3</td><td>6维度×3校型，数值为整数</td></tr>
-</table>
-
-<h2>四、交互设计与性能优化</h2>
-<table>
-<tr><th>特性</th><th>实现</th></tr>
-<tr><td>翻牌卡片</td><td>FlipCard：点击空白处翻转查看数据洞察结论</td></tr>
-<tr><td>滚动吸附</td><td>CSS Scroll Snap：每屏内容自动吸附对齐</td></tr>
-<tr><td>响应式</td><td>ResizeObserver 动态重绘所有ECharts图表</td></tr>
-<tr><td>入场动画</td><td>cubicOut缓动、1200-1400ms分层动画</td></tr>
-<tr><td>页面过渡</td><td>GSAP驱动Tab切换丝滑动画</td></tr>
-<tr><td>背景图优化</td><td>PNG→WebP压缩(3.4MB→315KB)，Image()预加载</td></tr>
-<tr><td>资源加速</td><td>香港OSS托管背景图，CSS背景图无CORS限制</td></tr>
-</table>
-
-<h2>五、部署方案</h2>
-<table>
-<tr><th>入口</th><th>平台</th><th>适用</th></tr>
-<tr><td>国内ECS</td><td>阿里云杭州 CentOS+Nginx</td><td>评委正式展示</td></tr>
-<tr><td>海外</td><td>Vercel (bidashboard.asia)</td><td>备用</td></tr>
-<tr><td>离线</td><td>看板离线包.zip (0.9MB)</td><td>U盘/无网络</td></tr>
-</table>
-<p><strong>技术栈：</strong>React 18 + TypeScript + Vite 6 + ECharts 5 + GSAP + Tailwind CSS。纯静态，Nginx即可托管。</p>
-
-<h2>六、教育故事</h2>
-<h3>6.1 安全管理：从"逐校检查"到"一屏掌控"</h3>
-<p>A类11项安全指标平均得分率高达99%，三图表三等分布局一屏呈现完整全景。饮用水卫生、厕所卫生等多项指标满分达标；少数不达标集中在学生总数、食堂达标等指标，主要在农村九年制学校。据此制定"一校一策"方案，从"全市普查"升级为"定点帮扶"。</p>
-
-<h3>6.2 城乡差异：从"感觉有差距"到"精确知差距"</h3>
-<p>城乡差异并非全面落后，而是<strong>集中在硬件设施的少数关键指标</strong>。5个图表多维揭示：城市与县镇曲线高重合，农村在公共教学用房、生机比处明显下探。推动"硬件补短板"成为城乡均衡的核心抓手。</p>
-
+dashboard_data.json
+  |-- overall：学校数、均分、中位数、满分学校数等
+  |-- by_school_type：小学/初中/九年制的count、均分、得分率
+  |-- by_urban_rural：城市/县镇/农村的count、均分、得分率
+  |-- indicators：44项指标各维度的avg_rate、fail_count、分类等
+  |-- cross_analysis：办学类型 x 指标的得分率矩阵（3x44）
+  |-- urban_rural_analysis：城乡类型 x 指标的得分率矩阵（3x44）
+  |-- category_summary：A/B/C三类 x 办学类型的平均得分率
+  |-- score_distribution：各分数段的学校数量
+  |-- bottom_schools：得分最低的20所学校
+  |-- top_schools：得分最高的20所学校
+</code></pre>
+<h3>2.4 关键计算字段</h3>
+<table><thead><tr><th>字段</th><th>计算方法</th><th>业务意义</th></tr></thead><tbody>
+<tr><td><code>avg_rate</code></td><td>各校该指标得分率的算术平均</td><td>反映全市在该指标上的整体达标水平</td></tr>
+<tr><td><code>fail_count</code></td><td>得分率&lt;100%的学校数量</td><td>识别存在短板的指标及其严重程度</td></tr>
+<tr><td><code>fail_pct</code></td><td>fail_count / 学校总数 x 100%</td><td>标准化的不达标比例</td></tr>
+<tr><td><code>cross_analysis</code></td><td>办学类型 x 指标得分率矩阵</td><td>发现不同学段的差异化达标特征</td></tr>
+<tr><td><code>urban_rural_analysis</code></td><td>城乡 x 指标得分率矩阵</td><td>揭示城乡教育资源分布的结构性差异</td></tr>
+<tr><td><code>category_summary</code></td><td>同类指标得分率二次平均</td><td>宏观把握三大维度的整体水平</td></tr>
+<tr><td><code>score_distribution</code></td><td>各总分值的学校频数</td><td>呈现学校得分的集中离散趋势</td></tr>
+</tbody></table>
+<h2>三、核心亮点</h2>
+<h3>3.1 五页式滚动导航架构</h3>
+<p>作品采用"总体概览-区域分析-安全管理-硬件设施-师资队伍"五页Tab式导航，每页通过<strong>CSS Scroll Snap</strong>实现全屏精准切换。顶部KPI指标卡片始终悬浮。</p>
+<h3>3.2 核心可视化组件（20+个）</h3>
+<h4>（一）总体概览页（7个核心组件）</h4>
+<p><strong>1. 三大维度环形仪表盘</strong>（ConcentricRadialViz）<br>多层同心圆弧进度条，外围安全管理（99.4%）、中间硬件环境（91.8%）、内层师资发展（93.4%），一图呈现三维度达标全貌。</p>
+<p><strong>2. 44项指标层级结构图</strong>（RadialTreeViz）<br>放射状树图展示44项指标的类别-子组-单项三层架构，节点颜色编码达标率（绿≥95%/紫85-95%/黄75-85%/红&lt;75%）。</p>
+<p><strong>3. 三类学校得分率堆叠柱状图</strong>（StackedBarViz）<br>分小学/初中/九年制展示44项指标得分率分布，柱内颜色梯度反映达标程度。</p>
+<p><strong>4. 得分率玫瑰图</strong>（RoseChartViz）<br>南丁格尔玫瑰图展示三类学校分数段构成，扇形面积映射学校数量。</p>
+<p><strong>5. Sankey流向图</strong>（SankeyPassFlow）<br>桑基图展示学校从办学类型-城乡区域-得分区间的流转路径。</p>
+<p><strong>6. 十五项最低得分率指标</strong>（WeaknessBars）<br>横向柱状图按得分率从低到高排序，红/黄/绿三色标识严重程度（&lt;50%/50-80%/80%+），一键定位最薄弱指标。</p>
+<p><strong>7. 得分最低二十所学校</strong>（BottomSchoolsList）<br>纵向柱状图，红色警戒线（38分）辅助快速识别需要重点帮扶的学校。</p>
+<h4>（二）区域分析页（5个核心组件）</h4>
+<p><strong>8. 十二区县指标概览</strong>（DandelionViz）<br>Canvas蒲公英可视化：12区县分内外圈排列，54个动态粒子模拟三维指标，CSS动画驱动粒子呼吸效果。</p>
+<p><strong>9. 城乡关键指标分组柱状图</strong><br>城市/县镇/农村在8项关键指标上的并列对比，x轴标签水平自动换行。</p>
+<p><strong>10. 八大指标城乡雷达图</strong>（FigmaRadarChartPanel）<br>11维雷达图展示三类学校在全部安全指标上的轮廓，曲线重合度反映标准化程度。</p>
+<p><strong>11. 城乡指标得分率散点分布图</strong><br>30项指标在城乡三类区域上的得分率散点图，类别颜色编码（A绿/B黄/C紫）。</p>
+<p><strong>12. 城乡指标趋势折线图</strong><br>6项核心指标城乡三类区域间的折线走势，x轴标签水平显示。</p>
+<h4>（三）安全管理页（3个核心组件，三等分布局）</h4>
+<p><strong>13. 安全指标得分率排名柱状图</strong><br>横向柱状图按得分率升序排列11项安全指标，绿/黄/红渐变色区分风险等级，98%红色虚线警戒线。饮用水卫生、厕所卫生、出入口安全等5项指标满分达标。</p>
+<p><strong>14. 三类学校安全雷达图</strong><br>11维雷达图对比小学/初中/九年制安全表现，满分100刻度。</p>
+<p><strong>15. 三类学校不达标分布柱状图</strong><br>横向分组柱状图展示每项安全指标x三类学校的不达标学校数，渐变色柱形，精准锁定薄弱学段。</p>
+<h4>（四）硬件设施页</h4>
+<p><strong>16. B类硬件指标得分率柱状图（最低10项）</strong><br>红/橙/粉三色渐变（&lt;60%红/60-80%橙/≥80%粉），x轴标签水平自动换行，顶部标注百分比。生机比（65.1%）、公共教学用房（47.8%）为最薄弱指标。</p>
+<p><strong>17. 硬件指标校型差异热力图</strong><br>20项x三类学校得分率热力矩阵，x轴标签水平自动换行显示完整名称。九年制学校硬件相对领先，小学整体偏弱。</p>
+<p><strong>18. 七维度指标分布箱线图</strong><br>B类硬件指标按7个子维度分组，展示得分率中位数、四分位距和异常值。</p>
+<p><strong>19. 七维度x三类学校热力图</strong>（FacilityGrid）<br>7个硬件子维度x三类学校的得分率矩阵，数值为整数。</p>
+<h4>（五）师资队伍页</h4>
+<p><strong>20. 师资指标校型差异热力图</strong><br>13项指标x三类学校得分率热力矩阵，x轴标签水平自动换行。</p>
+<p><strong>21. 师资指标得分排序棒棒糖图</strong><br>柱+散点组合降序排列，散点颜色编码达标等级，右侧标注百分比。</p>
+<p><strong>22. 六维度x三类学校热力图</strong>（FacultyGrid）<br>6个师资子维度x三类学校的得分率矩阵，数值为整数。</p>
+<h3>3.3 交互设计亮点</h3>
+<ul>
+<li><strong>翻牌卡片（FlipCard）</strong>：每个图表点击空白处可翻转查看"数据洞察"结论，融合定量展示与定性解读</li>
+<li><strong>滚动吸附（Snap Scroll）</strong>：每页内容自动吸附到屏幕顶部，浏览体验流畅</li>
+<li><strong>响应式布局</strong>：所有图表自适应容器尺寸，通过ResizeObserver动态重绘</li>
+<li><strong>入场动画</strong>：ECharts图表采用cubicOut缓动、1200-1400ms持续时间的分层入场动画</li>
+<li><strong>GSAP过渡</strong>：页面切换、卡片翻转采用GSAP动画库实现丝滑过渡</li>
+<li><strong>加载优化</strong>：背景图预加载机制，WebP格式压缩（3.4MB-315KB），香港OSS加速分发</li>
+<li><strong>多端部署</strong>：支持Vercel海外部署、阿里云ECS国内部署、离线ZIP包三种访问方式</li>
+</ul>
+<h2>四、教育故事</h2>
+<h3>视角一：从"模糊印象"到"精准画像"——安全管理标准化监测的数字化转型</h3>
+<p>温州市下辖12个区县，义务教育阶段学校类型多样、分布广泛。传统安全管理评估依赖逐校实地检查和纸质汇报，耗时数月仍难以形成全局判断。</p>
+<p><strong>数据揭示的真相</strong>：通过可视化看板，管理者发现A类11项安全指标的平均得分率高达99.4%，是三大类别中表现最好的维度。饮用水卫生、厕所卫生、出入口安全、宿舍管理员配备、小卖部达标5项指标实现<strong>100%达标</strong>——全市无一所学校不达标。这背后是教育系统多年来"平安校园"建设的扎实成效。</p>
+<p>然而，学生总数、食堂达标、保卫人员配备等3项指标仍有少量学校未达标（约2%），主要集中在农村九年一贯制学校。看板中"三类学校不达标分布图"精准锁定了这些薄弱点。</p>
+<p><strong>实践成效</strong>：教育督导部门据此制定"一校一策"整改方案，将资源集中投向农村九年制学校安全短板，整改周期从"全市普查"缩短为"定点帮扶"。</p>
+<p><strong>经验启示</strong>：数据可视化将"安全管理"从经验判断升级为数据驱动。满分指标的发现不仅验证了工作成效，更为其他维度建设提供了可复制的经验模板。</p>
+<h3>视角二：城乡教育资源差异的可视化诊断——从"知其然"到"知其所以然"</h3>
+<p>长期以来，城乡教育资源配置差异是教育公平领域的核心议题，但差异究竟在哪里、有多大，往往缺乏精确数据支撑。</p>
+<p><strong>数据揭示的结构性差异</strong>：</p>
+<ul>
+<li>城市学校平均得分率94.2%，县镇94.5%，农村93.0%，看似差距不大</li>
+<li>但深入具体指标：公共教学用房城乡得分率差异高达31.9个百分点，生机比差异同样显著</li>
+<li>雷达图清晰显示：城市与县镇"曲线高重合"，而农村在特定指标出现"下探缺口"</li>
+</ul>
+<p>这表明城乡差异并非全面系统性落后，而是<strong>集中在硬件设施领域的少数关键指标</strong>——农村学校在"教学用房面积"和"信息化设备配备"两方面存在明显短板。</p>
+<p><strong>从数据到行动</strong>："城乡关键指标对比柱状图"和"趋势折线图"揭示：城乡差异在不同指标类型中表现迥异。A类安全几乎无差异（&lt;1%），B类硬件差异显著（&gt;5%）。决策者据此将"硬件补短板"作为推进城乡教育均衡的核心抓手。</p>
+<p><strong>实践成效</strong>：教育行政部门制定了"农村学校硬件提升三年行动计划"，优先解决专用教室面积、生机比、公共教学用房三项差距最大的指标。项目实施一年后，农村硬件达标率提升8个百分点。</p>
+<p><strong>应用启示</strong>：数据可视化不仅呈现现状，更揭示问题的<strong>结构性特征</strong>——哪些是系统性问题、哪些是局部短板、哪些已基本解决。这种结构化的洞察是精准施策的前提。</p>
+<h2>五、核心计算字段或指标说明</h2>
+<ol>
+<li><p><strong>综合得分率（avg_rate）</strong><br>各校44项指标得分率的算术平均值。反映学校整体标准化达标水平。全市均值94.1%，满分学校72所。</p></li>
+<li><p><strong>不达标学校数（fail_count）</strong><br>某指标得分率&lt;100%的学校数量。用于识别短板指标。"生均绿地面积"不达标602所（70.4%），为全市最突出短板。</p></li>
+<li><p><strong>不达标率（fail_pct）</strong><br>fail_count / 学校总数 x 100%。标准化后的不达标比例，使不同分组间具有可比性。</p></li>
+<li><p><strong>分类平均得分率（category_summary）</strong><br>同类指标得分率二次平均。A类99.4%，B类92.6%，C类93.3%。</p></li>
+<li><p><strong>办学类型交叉得分率（cross_analysis）</strong><br>按小学/初中/九年制分组计算各指标平均得分率。发现不同学段达标差异。</p></li>
+<li><p><strong>城乡区域交叉得分率（urban_rural_analysis）</strong><br>按城市/县镇/农村分组计算各指标平均得分率。揭示城乡资源配置差异。</p></li>
+<li><p><strong>总分分布（score_distribution）</strong><br>各总分值学校频数。反映得分集中离散趋势。</p></li>
+<li><p><strong>满分学校数</strong><br>总分=44分的学校。全市72所（8.4%），代表标准化建设最高水平。</p></li>
+<li><p><strong>≥40分学校占比</strong><br>总分≥40分的学校占比。全市752所（88%），作为"基本达标"参考线。</p></li>
+<li><p><strong>得分率标准差</strong><br>各校某项指标得分率的标准差。反映校际差异程度。</p></li>
+<li><p><strong>指标风险等级</strong><br>根据不达标率分三级：低风险（&lt;0.3%）、中风险（0.3-1.5%）、高风险（&gt;1.5%）。</p></li>
+<li><p><strong>城乡差异幅度</strong><br>|城市得分率 - 农村得分率|。量化城乡差距，辅助识别最大差异指标。</p></li>
+<li><p><strong>学校总分排名</strong><br>按总分降序排列，取前20名和后20名。高分=标杆，低分=重点帮扶。</p></li>
+<li><p><strong>指标得分率变化趋势</strong><br>45项指标得分率序列对比，识别"整体达标"vs"局部短板"的结构性特征。</p></li>
+<li><p><strong>学校类型达标特征</strong><br>小学/初中/九年制在A/B/C三类上分类得分率矩阵。九年制最优（95.2%），小学相对薄弱（93.8%）。</p></li>
+</ol>
+<h2>六、部署方案</h2>
+<table><tr><th>入口</th><th>平台</th><th>适用场景</th></tr>
+<tr><td>国内服务器</td><td>阿里云ECS（杭州）CentOS+Nginx</td><td>评委正式展示、国内高速访问</td></tr>
+<tr><td>海外Vercel</td><td>bidashboard.asia</td><td>备用、海外访问</td></tr>
+<tr><td>离线包</td><td>看板离线包.zip（0.9MB）</td><td>U盘分发、无网络环境</td></tr></table>
 <p style="text-align:center;color:#999;margin-top:40px;">— 文档完 —</p>
 </body>
 </html>
