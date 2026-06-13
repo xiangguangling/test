@@ -61,7 +61,7 @@ export default function FacilityGrid({ data }: { data: DashboardData }) {
   subgroups.forEach(([, g], xi) => {
     stypes.forEach((st, yi) => {
       const vals = g.keys.map(k => data.cross_analysis[st]?.[k] ?? 0).filter(v => v > 0);
-      const avg = vals.length ? +(vals.reduce((a, b) => a + b, 0) / vals.length * 100).toFixed(1) : 0;
+      const avg = vals.length ? +(vals.reduce((a, b) => a + b, 0) / vals.length * 100).toFixed(0) : 0;
       heatData.push([xi, yi, avg]);
     });
   });

@@ -530,7 +530,7 @@ export function getRegionalLineInsight(data: DashboardData): ChartInsight {
     bigNumber: fmtPct(city.avg_rate - rural.avg_rate),
     bigNumberColor: 'rose',
     unit: '% 城乡趋势差距',
-    description: `6项核心指标在城乡三类区域间的折线走势：城市折线整体最高，农村折线在公共教学用房和生机比处明显下探。三条折线走势趋同但整体平移，说明城乡差异是系统性的。`,
+    description: `6项核心指标在城乡三类区域间的折线走势：城市折线整体最高，农村折线在公共教学用房和生机比处明显下探。`,
     tag: { text: '系统性差异', type: 'warn' },
   };
 }
@@ -606,7 +606,7 @@ export function getFacilityHeatmapInsight(data: DashboardData): ChartInsight {
     bigNumber: fmtPct(avg),
     bigNumberColor: 'orange',
     unit: '% B类平均得分率',
-    description: `热力图展示硬件指标×三类学校的得分率矩阵。绿色越深越好、红色越深越差。小学整体偏绿，初中偏黄红。"${worst?.name || '公共教学用房'}"在三类学校中均表现最差，是共性短板。`,
+    description: `热力图展示20项硬件指标×三类学校的得分率矩阵。九年制学校硬件相对领先，小学整体偏弱。${worst?.name || '公共教学用房'}在三类学校中均表现最差，是共性短板。`,
     tag: { text: `均值${fmtPct(avg)}%`, type: 'warn' },
   };
 }

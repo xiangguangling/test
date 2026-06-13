@@ -493,27 +493,6 @@ export default function RadialTreeViz({
               </text>
             </g>
           </svg>
-
-          <div style={{
-            position: 'absolute', right: 24, bottom: 16, display: 'flex', gap: 16,
-            fontSize: cfg.legendFont, color: '#9292C1', fontFamily: 'Roboto, sans-serif',
-            opacity: centerP,
-          }}>
-            {[
-              { color: '#8676FF', label: '类别' },
-              { color: '#8676FF', label: '子组', ring: true },
-              { color: '#FF2D2E', label: '单项' },
-            ].map(item => (
-              <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <span style={{
-                  width: 12, height: 12, borderRadius: '50%',
-                  background: item.ring ? '#fff' : item.color,
-                  border: item.ring ? `2px solid ${item.color}` : 'none',
-                }} />
-                {item.label}
-              </div>
-            ))}
-          </div>
         </div>
       </FigmaScaledCanvas>
     </ChartCard>

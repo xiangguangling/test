@@ -144,11 +144,17 @@ export function buildSchoolTypeHeatmapOption(
       formatter: (p: { value: [number, number, number] }) =>
         `${indicators[p.value[0]]?.name ?? ''} · ${schoolTypes[p.value[1]]}<br/>得分率: <b>${(p.value[2] * 100).toFixed(1)}%</b>`,
     },
-    grid: { left: '12%', right: '8%', top: '10%', bottom: '5%' },
+    grid: { left: '12%', right: '8%', top: '10%', bottom: '12%' },
     xAxis: {
       type: 'category' as const,
-      data: indicators.map(i => (i.name.length > 6 ? i.name.slice(0, 6) + '…' : i.name)),
-      axisLabel: { color: '#9292C1', fontSize: 7, rotate: 35 },
+      data: indicators.map(i => i.name),
+      axisLabel: {
+        color: '#9292C1',
+        fontSize: 8,
+        overflow: 'break' as const,
+        width: 60,
+        interval: 0,
+      },
     },
     yAxis: {
       type: 'category' as const,

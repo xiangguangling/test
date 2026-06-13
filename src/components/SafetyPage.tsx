@@ -7,7 +7,6 @@ import type { DashboardData } from '../types';
 import { mountEcharts } from '../utils/chartResize';
 import StatCard from './StatCard';
 import ChartCard from './ChartCard';
-import SafetyGrid from './SafetyGrid';
 import TabPageLayout, { TabSnapSection } from './TabPageLayout';
 import { getSafetyBarInsight, getSafetyRadarInsight } from './ChartInsights';
 
@@ -30,6 +29,7 @@ const A_INDICATORS = [
 export default function SafetyPage({ data }: { data: DashboardData }) {
   const barRef = useRef<HTMLDivElement>(null);
   const radarRef = useRef<HTMLDivElement>(null);
+  const gridBarRef = useRef<HTMLDivElement>(null);
 
   const safetyInds = useMemo(() =>
     A_INDICATORS.map(meta => {
@@ -117,7 +117,7 @@ export default function SafetyPage({ data }: { data: DashboardData }) {
           silent: true,
           symbol: 'none',
           lineStyle: { color: '#FF2D2E', type: 'dashed' as const, width: 1.5 },
-          label: { color: '#FF2D2E', fontSize: 10, formatter: '警戒线 98%' },
+          label: { color: '#FF2D2E', fontSize: 10, formatter: '警戒线 98%', position: 'start' as const },
           data: [{ xAxis: 98 }],
         },
       }],
@@ -139,8 +139,8 @@ export default function SafetyPage({ data }: { data: DashboardData }) {
       });
       const minVal = Math.min(...vals);
       const maxVal = Math.max(...vals);
-      // 收紧轴范围让差异放大：min 取最小值-0.3，max 取最大值+0.2
-      return { name: meta.name, min: Math.floor(minVal - 0.3), max: Math.min(100.5, Math.ceil(maxVal + 0.2)) };
+      // 最外围满分100，不留白
+      return { name: meta.name, max: 100 };
     });
 
     const seriesData = stypes.map((st, si) => ({
@@ -154,7 +154,7 @@ export default function SafetyPage({ data }: { data: DashboardData }) {
       data: [{
         value: A_INDICATORS.map(meta => {
           const v = data.cross_analysis[st]?.[meta.key];
-          return v != null ? +(v * 100).toFixed(1) : 99;
+          return v != null ? +(v * 100).toFixed(3) : 100;
         }),
         name: st,
       }],
@@ -188,6 +188,46 @@ export default function SafetyPage({ data }: { data: DashboardData }) {
     return () => chart.dispose();
   }, [data]);
 
+  // ===== 横向柱状图：三类学校不达标分布 =====
+  useEffect(() => {
+    if (!gridBarRef.current) return;
+    const stypes = ['小学', '初中', '九年制'] as const;
+    const stColors = ['#8676FF', '#FF708B', '#66C8FF'];
+    const typeCounts: Record<string, number> = {};
+    for (const st of stypes) {
+      typeCounts[st] = data.by_school_type[st]?.count ?? 1;
+    }
+    const failByType = A_INDICATORS.map(meta => {
+      const vals = stypes.map(st => {
+        const rate = data.cross_analysis[st]?.[meta.key] ?? 1;
+        return Math.round(typeCounts[st] * (1 - rate));
+      });
+      return { name: meta.name, vals, total: vals.reduce((a, b) => a + b, 0) };
+    }).filter(d => d.total > 0).sort((a, b) => b.total - a.total);
+    const maxFailVal = Math.max(...failByType.flatMap(d => d.vals), 1);
+
+    const chart = mountEcharts(gridBarRef.current, {
+      backgroundColor: 'transparent', animation: true, animationDuration: 1400, animationEasing: 'cubicOut',
+      tooltip: { trigger: 'axis' as const, backgroundColor: '#FFFFFF', borderColor: '#E8ECF4', textStyle: { color: '#383874', fontSize: 12 },
+        formatter: (p: any) => {
+          if (!p?.length) return '';
+          const total = p.reduce((s: number, item: any) => s + (item.value || 0), 0);
+          return `<b>${p[0].axisValue}</b><br/>${p.map((s: any) => `${s.marker} ${s.seriesName}: <b>${s.value}所</b>`).join('<br/>')}<hr style="margin:4px 0;border:none;border-top:1px solid #e8ecf4"/>合计不达标: <b>${total}所</b>`;
+        } },
+      legend: { data: [...stypes], bottom: 0, textStyle: { color: '#383874', fontSize: 10 }, itemWidth: 10, itemHeight: 10 },
+      grid: { left: '3%', right: '10%', top: '6%', bottom: '14%', containLabel: true },
+      xAxis: { type: 'value' as const, name: '不达标学校数（所）', nameTextStyle: { color: '#9292C1', fontSize: 10 }, axisLabel: { color: '#9292C1', fontSize: 10 }, splitLine: { lineStyle: { color: '#F2F5FA', type: 'dashed' as const } }, max: maxFailVal * 1.4 },
+      yAxis: { type: 'category' as const, data: failByType.map(d => d.name), axisLabel: { color: '#383874', fontSize: 11 }, axisLine: { show: false }, axisTick: { show: false }, inverse: true },
+      series: stypes.map((st, si) => ({
+        name: st, type: 'bar' as const, barWidth: '20%', barGap: '12%',
+        itemStyle: { borderRadius: [0, 6, 6, 0], color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [{ offset: 0, color: stColors[si] }, { offset: 1, color: stColors[si] + '44' }]) },
+        label: { show: true, position: 'right' as const, color: '#383874', fontSize: 9, fontWeight: 'bold' as const, formatter: (p: any) => p.value > 0 ? p.value : '' },
+        data: failByType.map(d => d.vals[si]),
+      })),
+    });
+    return () => chart.dispose();
+  }, [data]);
+
   return (
     <TabPageLayout
       stats={(
@@ -200,21 +240,18 @@ export default function SafetyPage({ data }: { data: DashboardData }) {
         </div>
       )}
     >
-      {/* 第一屏：安全指标得分率 + 三类学校雷达 */}
       <TabSnapSection>
-        <div className="tab-snap-section--split">
+        <div className="tab-snap-section--grid-3">
           <ChartCard title="安全指标得分率排名" insight={getSafetyBarInsight(data)}>
             <div ref={barRef} className="chart-echarts-host" />
           </ChartCard>
           <ChartCard title="三类学校安全雷达" insight={getSafetyRadarInsight(data)}>
             <div ref={radarRef} className="chart-echarts-host" />
           </ChartCard>
+          <ChartCard title="三类学校不达标分布" insight={getSafetyBarInsight(data)}>
+            <div ref={gridBarRef} className="chart-echarts-host" />
+          </ChartCard>
         </div>
-      </TabSnapSection>
-
-      {/* 第二屏：风险矩阵 + 城乡热力 */}
-      <TabSnapSection>
-        <SafetyGrid data={data} />
       </TabSnapSection>
     </TabPageLayout>
   );

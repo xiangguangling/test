@@ -1,6 +1,6 @@
 ﻿import { useMemo, useEffect, useRef } from 'react';
 import * as echarts from 'echarts/core';
-import { BarChart, ScatterChart } from 'echarts/charts';
+import { BarChart } from 'echarts/charts';
 import { GridComponent, TooltipComponent, LegendComponent } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
 import gsap from 'gsap';
@@ -10,7 +10,7 @@ import InsightBack from './InsightBack';
 import { getSafetyGridInsight } from './ChartInsights';
 import { useEcharts } from '../hooks/useEcharts';
 
-echarts.use([BarChart, ScatterChart, GridComponent, TooltipComponent, LegendComponent, CanvasRenderer]);
+echarts.use([BarChart, GridComponent, TooltipComponent, LegendComponent, CanvasRenderer]);
 
 const A_INDICATORS = [
   { key: 'A1.1得分率', name: '班级与班额' },
@@ -39,100 +39,12 @@ function Cell({ t, i, c, children }: { t: string; i: string; c: string; children
 }
 
 export default function SafetyGrid({ data }: { data: DashboardData }) {
-  const r1 = useRef<HTMLDivElement>(null);
   const r2 = useRef<HTMLDivElement>(null);
   const ct = useRef<HTMLDivElement>(null);
 
   useEffect(() => { gsap.fromTo(ct.current, { opacity: 0 }, { opacity: 1, duration: 0.5 }); }, []);
 
-  // ===== 左：不达标风险气泡图 =====
-  const bubbleData = useMemo(() => {
-    return A_INDICATORS.map(meta => {
-      const ind = data.indicators.find(i => i.key === meta.key);
-      const failCount = ind?.fail_count ?? 0;
-      const failPct = ind?.fail_pct ?? 0;
-      const rate = ind ? +(ind.avg_rate * 100).toFixed(1) : 100;
-      // risk level: 1=low, 2=medium, 3=high
-      const risk = failPct > 1.5 ? 3 : failPct > 0.3 ? 2 : 1;
-      return {
-        name: meta.name,
-        value: [failCount, failPct, failCount || 1],
-        rate,
-        risk,
-      };
-    });
-  }, [data]);
-
-  useEcharts(r1, {
-    backgroundColor: 'transparent',
-    animation: true,
-    animationDuration: 1400,
-    animationEasing: 'cubicOut',
-    tooltip: {
-      trigger: 'item' as const,
-      backgroundColor: '#FFFFFF',
-      borderColor: '#E8ECF4',
-      textStyle: { color: '#383874', fontSize: 12 },
-      formatter: (p: any) => {
-        const d = p.data;
-        if (!d) return '';
-        const riskLabel = d.risk === 3 ? '⚠️ 高风险' : d.risk === 2 ? '🔶 中风险' : '✅ 低风险';
-        return `<b>${d.name}</b><br/>不达标: <b>${d.value[0]}</b> 所<br/>不达标率: <b>${d.value[1].toFixed(1)}%</b><br/>得分率: <b>${d.rate}%</b><br/>${riskLabel}`;
-      },
-    },
-    grid: { left: '10%', right: '8%', top: '8%', bottom: '8%' },
-    xAxis: {
-      type: 'value' as const,
-      name: '不达标学校数（所）',
-      nameTextStyle: { color: '#9292C1', fontSize: 10 },
-      axisLabel: { color: '#9292C1', fontSize: 10 },
-      splitLine: { lineStyle: { color: '#F2F5FA', type: 'dashed' as const } },
-      max: Math.max(...bubbleData.map(d => d.value[0]), 1) * 1.3,
-    },
-    yAxis: {
-      type: 'value' as const,
-      name: '不达标率 (%)',
-      nameTextStyle: { color: '#9292C1', fontSize: 10 },
-      axisLabel: { color: '#9292C1', fontSize: 10, formatter: '{value}%' },
-      splitLine: { lineStyle: { color: '#F2F5FA', type: 'dashed' as const } },
-      max: Math.max(...bubbleData.map(d => d.value[1]), 1) * 1.3,
-    },
-    series: [{
-      type: 'scatter' as const,
-      symbolSize: (val: number[]) => Math.max(10, Math.min(60, (val[2] || 1) * 2.5)),
-      data: bubbleData.map(d => ({
-        ...d,
-        itemStyle: {
-          color: d.risk === 3
-            ? new echarts.graphic.RadialGradient(0.4, 0.3, 1, [
-                { offset: 0, color: '#FF708B' }, { offset: 1, color: '#FF708B44' },
-              ])
-            : d.risk === 2
-            ? new echarts.graphic.RadialGradient(0.4, 0.3, 1, [
-                { offset: 0, color: '#FFBA69' }, { offset: 1, color: '#FFBA6944' },
-              ])
-            : new echarts.graphic.RadialGradient(0.4, 0.3, 1, [
-                { offset: 0, color: '#00B929' }, { offset: 1, color: '#00B92944' },
-              ]),
-          shadowBlur: 8,
-          shadowColor: 'rgba(0,0,0,0.08)',
-        },
-      })),
-      label: {
-        show: true,
-        position: 'right' as const,
-        color: '#383874',
-        fontSize: 10,
-        formatter: (p: any) => p.data.value[0] > 0 ? p.data.name : '',
-      },
-      emphasis: {
-        scale: 1.4,
-        focus: 'self' as const,
-      },
-    }],
-  });
-
-  // ===== 右：三类学校不达标分布 — 分组柱状图 =====
+  // ===== 三类学校不达标分布 — 分组柱状图 =====
   const stypes = ['小学', '初中', '九年制'] as const;
   const stColors = ['#8676FF', '#FF708B', '#66C8FF'];
   
@@ -226,13 +138,14 @@ export default function SafetyGrid({ data }: { data: DashboardData }) {
   });
 
   const cells = [
-    { r: r1, t: '不达标风险矩阵', i: '🔴', c: '#FF2D2E', insightIndex: 0 },
     { r: r2, t: '三类学校不达标分布', i: '🏫', c: '#8676FF', insightIndex: 2 },
   ];
 
   return (
     <div ref={ct}>
-      <div className="grid grid-cols-2 grid-chart-grid grid-chart-grid--fit">
+      <div className="grid grid-cols-3 grid-chart-grid grid-chart-grid--fit">
+        {/* 左占位 */}
+        <div />
         {cells.map((item, i) => {
           const cellInsight = getSafetyGridInsight(data, item.insightIndex);
           return (

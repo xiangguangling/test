@@ -152,6 +152,16 @@ export default function DandelionViz() {
 
       if (!ctx) return;
       ctx.clearRect(0, 0, width, height);
+
+      // 居中标题
+      ctx.save();
+      ctx.fillStyle = '#1a2a2a';
+      ctx.font = 'bold 18px -apple-system, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      ctx.fillText('十二区县指标概览', width / 2, 4);
+      ctx.restore();
+
       if (globalScale < 1) globalScale += 0.012;
       time += isHovered ? 0.003 : 0.014;
 

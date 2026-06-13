@@ -39,6 +39,7 @@ function LoadingOverlay({
   onPhaseChange: (phase: 'loading' | 'ready' | 'exit') => void;
 }) {
   const [phase, setPhase] = useState<'loading' | 'ready' | 'exit'>('loading');
+  const [bgReady, setBgReady] = useState(false);
   const fillRef = useRef<HTMLDivElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLSpanElement>(null);
@@ -50,7 +51,29 @@ function LoadingOverlay({
     onPhaseChangeRef.current = onPhaseChange;
   }, [onComplete, onPhaseChange]);
 
+  // 预加载背景图，加载完成后再开始进度条
   useEffect(() => {
+    const img = new Image();
+    let timeoutId: ReturnType<typeof setTimeout>;
+    const onDone = () => {
+      clearTimeout(timeoutId);
+      setBgReady(true);
+    };
+    img.onload = onDone;
+    img.onerror = onDone; // 加载失败也继续，不阻塞
+    img.src = './campus-3d-bg.png';
+    // 最多等 5 秒，超时也继续
+    timeoutId = setTimeout(onDone, 5000);
+    return () => {
+      clearTimeout(timeoutId);
+      img.onload = null;
+      img.onerror = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!bgReady) return; // 等背景图就绪再开始进度条
+
     const duration = 2200;
     const start = performance.now();
     let rafId = 0;
@@ -90,7 +113,7 @@ function LoadingOverlay({
 
     rafId = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafId);
-  }, []);
+  }, [bgReady]);
 
   return (
     <div className="loading-content">
@@ -135,7 +158,7 @@ function LoadingOverlay({
       </div>
 
       <p className="loading-hint">
-        {phase === 'ready' ? '✓ 数据加载完成' : '正在加载监测数据...'}
+        {!bgReady ? '正在加载资源...' : phase === 'ready' ? '✓ 数据加载完成' : '正在加载监测数据...'}
       </p>
     </div>
   );

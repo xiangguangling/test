@@ -59,7 +59,7 @@ export default function FacultyGrid({ data }: { data: DashboardData }) {
     const items = catCIndicators.filter(ind => ind.group === g);
     stypes.forEach((st, si) => {
       const vals = items.map(ind => data.cross_analysis[st]?.[ind.key] ?? 0).filter(v => v > 0);
-      const avg = vals.length ? +(vals.reduce((a, b) => a + b, 0) / vals.length * 100).toFixed(1) : 0;
+      const avg = vals.length ? +(vals.reduce((a, b) => a + b, 0) / vals.length * 100).toFixed(0) : 0;
       heatCData.push([di, si, avg]);
     });
   });
