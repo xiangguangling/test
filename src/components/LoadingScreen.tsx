@@ -13,7 +13,7 @@ const LoadingBackground = memo(function LoadingBackground() {
         style={{
           position: 'absolute',
           inset: 0,
-          backgroundImage: 'url(./campus-3d-bg.webp)',
+          backgroundImage: 'url(https://dashboard-kanban.oss-cn-hongkong.aliyuncs.com/campus-3d-bg.webp)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           filter: 'brightness(0.35) saturate(0.6)',
@@ -61,7 +61,7 @@ function LoadingOverlay({
     };
     img.onload = onDone;
     img.onerror = onDone; // 加载失败也继续，不阻塞
-    img.src = './campus-3d-bg.webp';
+    img.src = 'https://dashboard-kanban.oss-cn-hongkong.aliyuncs.com/campus-3d-bg.webp';
     // 最多等 5 秒，超时也继续
     timeoutId = setTimeout(onDone, 5000);
     return () => {

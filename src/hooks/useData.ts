@@ -7,7 +7,7 @@ export function useData() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('./dashboard_data.json')
+    fetch('https://dashboard-kanban.oss-cn-hongkong.aliyuncs.com/dashboard_data.json')
       .then((res) => {
         if (!res.ok) throw new Error('数据加载失败');
         return res.json();
